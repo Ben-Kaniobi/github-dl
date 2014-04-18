@@ -72,8 +72,6 @@ select yn in "Yes" "No"; do
         No ) exit;;
     esac
 done
-echo
-exit
 
 # Create the folder
 mkdir -p $FOLDERNAME
