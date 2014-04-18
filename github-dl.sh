@@ -57,12 +57,23 @@ fi
 # BRANCH      master
 # FOLDER      dir/subdir/folder
 # FOLDERNAME  folder
-#echo "HOST:       '$HOST'"
-#echo "REPO:       '$REPO'"
-#echo "BRANCH:     '$BRANCH'"
-#echo "FOLDER:     '$FOLDER'"
-#echo "FOLDERNAME: '$FOLDERNAME'"
-#exit 0
+echo
+echo "HOST:       '$HOST'"
+echo "REPO:       '$REPO'"
+echo "BRANCH:     '$BRANCH'"
+echo "FOLDER:     '$FOLDER'"
+echo "FOLDERNAME: '$FOLDERNAME'"
+# Prompt 
+echo
+echo "Continue?"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) break;;
+        No ) exit;;
+    esac
+done
+echo
+exit
 
 # Create the folder
 mkdir -p $FOLDERNAME
