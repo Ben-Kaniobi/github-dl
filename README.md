@@ -1,7 +1,7 @@
 github-dl
 =========
 
-Bash script to download subfolders of a GitHub repository
+Bash script to download a folder/subfolder of a GitHub repository
 
 Arguments
 ---------
