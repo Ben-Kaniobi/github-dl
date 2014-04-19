@@ -58,32 +58,60 @@ fi
 # FOLDER      dir/subdir/folder
 # FOLDERNAME  folder
 echo
-echo "HOST:       '$HOST'"
+#echo "HOST:       '$HOST'"
 echo "REPO:       '$REPO'"
 echo "BRANCH:     '$BRANCH'"
 echo "FOLDER:     '$FOLDER'"
-echo "FOLDERNAME: '$FOLDERNAME'"
+#echo "FOLDERNAME: '$FOLDERNAME'"
 # Prompt 
 echo
 echo "Continue?"
-select yn in "Yes" "No"; do
-    case $yn in
-        Yes ) break;;
-        No ) exit;;
-    esac
+choice1="Yes, include subfolders"
+choice2="Yes, single folder"
+choice3="No"
+select result in "$choice1" "$choice2" "$choice3"
+do
+	case $result in
+		$choice1 ) RECURSIVE=1; break;;
+		$choice2 ) RECURSIVE=0; break;;
+		$choice3 ) exit;;
+	esac
 done
 
-# Create the folder
-mkdir -p $FOLDERNAME
-cd $FOLDERNAME
+# Define the recursive download function
+recursive_download() {
+	# Create the folder
+	mkdir -p $FOLDERNAME
+	cd $FOLDERNAME
 
-# Download GitHub html page of this folder
-curl -3 -L $HOST/$REPO/tree/$BRANCH/$FOLDER > tmp1
-# Find and prepare file URLs
-sed 's,",\n -3LO '"$HOST"',g' tmp1 | grep $REPO/blob/$BRANCH/$FOLDER > tmp2
+	# Download GitHub html page of this folder
+	curl -3 -L $HOST/$REPO/tree/$BRANCH/$FOLDER > tmp1
+	# Find and prepare file URLs
+	sed 's,",\n -3LO '"$HOST"',g' tmp1 | grep $REPO/blob/$BRANCH/$FOLDER > tmp2
 
-# Download raw files
-curl $(cat tmp2 | sed 's/blob/raw/g')
+	# Download raw files
+	curl $(cat tmp2 | sed 's/blob/raw/g')
 
-# Remove temporary files
-rm tmp1 tmp2
+	if [ $RECURSIVE -ge 1 ]
+	then
+		# Find subfolder URLs
+		sed 's/"/\n/g' tmp1 | grep tree/$BRANCH/$FOLDER/ | sed 's,'"\/$REPO\/tree\/$BRANCH\/"',,g' > tmp2
+
+		# Recursively call this function for every line
+		while read line           
+		do
+			FOLDER=$line
+			FOLDERNAME=${FOLDER##*/}
+			recursive_download
+		done <tmp2
+	fi
+	
+	# Remove temporary files
+	rm -f tmp1 tmp2
+	
+	# Leave subfolder
+	cd ..
+}
+
+# Call the recursive download function
+recursive_download
