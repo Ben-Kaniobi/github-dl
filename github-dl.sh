@@ -78,12 +78,12 @@ mkdir -p $FOLDERNAME
 cd $FOLDERNAME
 
 # Download GitHub html page of this folder
-curl -3 -L $HOST/$REPO/tree/$BRANCH/$FOLDER > dl.temp
+curl -3 -L $HOST/$REPO/tree/$BRANCH/$FOLDER > tmp1
 # Find and prepare file URLs
-sed 's,",\n -3LO '"$HOST"',g' dl.temp | grep $REPO/blob/$BRANCH/$FOLDER > dl2.temp
+sed 's,",\n -3LO '"$HOST"',g' tmp1 | grep $REPO/blob/$BRANCH/$FOLDER > tmp2
 
 # Download raw files
-curl $(cat dl2.temp | sed 's/blob/raw/g')
+curl $(cat tmp2 | sed 's/blob/raw/g')
 
 # Remove temporary files
-rm dl.temp dl2.temp
+rm tmp1 tmp2
